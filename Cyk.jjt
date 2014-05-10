@@ -20,7 +20,8 @@ public class Cyk
 	//Container para armazenar as regras da gramatica. Primeira string representa o simbolo. A -> B C seria um ArrayList("A","B","C")
     static ArrayList<ArrayList<String> > rules = new ArrayList<ArrayList<String> >();
   	static ArrayList< String > value = new ArrayList< String >();
-  	//static String symbol = new String();
+  	static String sentence = new String();
+  	ArrayList< String > sentenceArray;
 
   	/*static private void printRules() //a ser usado mais para a frente
   	{
@@ -77,7 +78,36 @@ public class Cyk
 		else 
 			return false;
 	}
-  	
+
+  	private String table[][];
+  
+	public boolean checkCyk()
+	{
+	 	table = new String[rules.size()][rules.size()];
+		sentenceArray = new ArrayList(Arrays.asList(sentence.split(" ")));
+		
+	 	//inicializar tabela
+		for (int i = 0; i < rules.size(); i++)
+			for (int j = 0; j < rules.size(); j++)
+				table[i][j] = "";
+
+		//primeira linha da tabela
+		for (int i = 0; i < sentenceArray.size(); i++) //percorre a frase recebida
+        {
+            for (int j = 0; j < rules.size(); j++) //para cada palavra ve as regras
+            {
+                ArrayList<String> rule = new ArrayList<String>();
+				rule = rules.get(j);
+
+				if (rule.size() == 2) //so se for regra do tipo "A -> palavra" 
+					if (sentenceArray.get(i).equals(rule.get(1))) //se a palavra da frase recebida for igual a da regra a ser processada
+                    	table[i][0] = table[i][0] + " " + rule.get(0); //adiciona o Simbolo a tabela               
+            }
+        }
+
+		return true;	  
+	}
+	
     public static void main(String args[]) throws ParseException {
         System.out.println("\nInput context-free-grammar in CNF: ");
 
@@ -113,7 +143,9 @@ SKIP :
 
 TOKEN:
 {
-	<WORD: (["a"-"z"])+ >
+	
+	 < SENTENCE: (< WORD > (" ")?)+ >
+	| < WORD: (["a"-"z"])+ > 
 	| < SYMBOL: (["A"-"Z"])+ >
 }
 
@@ -125,7 +157,7 @@ Value := Word;
 
 SimpleNode Program(): {}
 {
-  (Assignment())+
+  (Assignment())+ Sentence()
    {return jjtThis;}
 }
 
@@ -142,7 +174,7 @@ void Symbol() : {Token t;}
 		value.add(new String(t.image));
 	}	
 }
-void Value() : {Token t;} // "A - > B C F;" ou "C - > valor;"
+void Value() : {Token t;} // "A - > B C;" ou "C - > valor;"
 {	(
 		t=<WORD>  #Word {value.add(new String(t.image));}
 		| 		  
@@ -151,5 +183,14 @@ void Symbol() : {Token t;}
 	)
 	{		rules.add(value);
 		//System.out.print("adicionado");
+	}
+}
+
+void Sentence() : {Token t;}
+{
+	t=< SENTENCE >
+	{
+    	sentence = (new String(t.image));
+    	System.out.println("Sentence: "+sentence);
 	}
 }
