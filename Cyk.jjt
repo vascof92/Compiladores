@@ -82,13 +82,13 @@ public class Cyk
   	private static String table[][];
   
 	public static boolean checkCyk()
-	{
-	 	table = new String[rules.size()][rules.size()];
+	{	 	
 		sentenceArray = new ArrayList(Arrays.asList(sentence.split(" ")));
+		table = new String[sentenceArray.size()][sentenceArray.size()];
 		
 	 	//inicializar tabela
-		for (int i = 0; i < rules.size(); i++)
-			for (int j = 0; j < rules.size(); j++)
+		for (int i = 0; i < sentenceArray.size(); i++)
+			for (int j = 0; j < sentenceArray.size(); j++)
 				table[i][j] = "";
 
 		//primeira linha da tabela
@@ -105,39 +105,41 @@ public class Cyk
             }
         }
 
-
 		//Preencher o resto da tabela
-		//i - column, j - row
+		//i - row, j - column
         for (int i = 1; i < sentenceArray.size(); i++)
 			for (int j = 0; j < sentenceArray.size() - i; j++)
-				for (int k = 0; k < i; k++) //k=1					for (int r = 0; r < rules.size(); r++)
+				for (int k = 0; k < i; k++)					for (int r = 0; r < rules.size(); r++)
 					{						ArrayList<String> rule = new ArrayList<String>();
-						rule = rules.get(j);
+						rule = rules.get(r);
 					
 						//if P[j,k,B] and P[j+k,i-k,C] then set P[j,i,A] = true
 					
 						if (rule.size() == 3) // apenas se for uma regra com simbolos nao terminais tipo "A -> B C"
 						{
-							/*if (!table[j][k].equals("") && !table[j+k+1][i-k-1].equals("")) 
-							{*/							  	//System.out.println(table[j+k+1][i-k-1]+" "+rule.get(2));
-							  	//System.out.println(table[j][k].indexOf(rule.get(1)));								
-								if (table[j][k].equals(rule.get(1)) && table[j+k+1][i-k-1].equals(rule.get(2)))
-								//if (table[j][k].indexOf(rule.get(1)) != -1 && table[j+k+1][i-k-1].indexOf(rule.get(2)) != -1)
-								{
-								 	System.out.println("cenas");									table[j][i] = table[i][0]+rule.get(0);
+							if (!table[j][k].equals("") && !table[j+k+1][i-k-1].equals("")) 
+							{								
+								if (table[j][k].equals(rule.get(1)) && table[j+k+1][i-k-1].equals(rule.get(2)))									
+								{									table[j][i] = rule.get(0);
 								}
-							//}
+							}
 						}  
 					}
 
-		for (int i = 0; i < rules.size(); i++)
+		System.out.println("CYK Table:\n");
+		for (int i = 0; i < sentenceArray.size(); i++)
 		{
-			for (int j = 0; j < rules.size(); j++)
+			for (int j = 0; j < sentenceArray.size(); j++)
 			{				System.out.print(table[j][i]+" ");
 			}
 				System.out.println("");
 		}
-			
+
+		if (table[0][sentenceArray.size()-1].equals("")) //se a posicao mais alta da tabela estiver vazia
+			System.out.println("\nThis sentence isn't a member of the grammar.");
+		else
+			System.out.println("\nThis sentence is a member of the grammar.");
+			 
 		return true;	  
 	}
 	
@@ -148,14 +150,17 @@ public class Cyk
         SimpleNode root = cyk.Program();
 		
         // dump tree
+        System.out.println("Abstract Syntax Tree:\n");
         root.dump("");
 				
 		if (checkGrammar())
-			System.out.println("sim");
+		{
+		 	System.out.println("---------------\nValid Grammar\n---------------");
+			checkCyk();
+		}
 		else
-			System.out.println("nao");
+			System.out.println("Invalid Grammar");
 
-		checkCyk();
         // create the symbol table
         //cky.createSymbolTable(root);
 
@@ -225,6 +230,5 @@ void Sentence() : {Token t;}
 	t=< SENTENCE >
 	{
     	sentence = (new String(t.image));
-    	System.out.println("Sentence: "+sentence);
 	}
 }
