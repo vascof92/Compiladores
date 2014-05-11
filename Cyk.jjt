@@ -21,7 +21,7 @@ public class Cyk
     static ArrayList<ArrayList<String> > rules = new ArrayList<ArrayList<String> >();
   	static ArrayList< String > value = new ArrayList< String >();
   	static String sentence = new String();
-  	ArrayList< String > sentenceArray;
+  	static ArrayList< String > sentenceArray;
 
   	/*static private void printRules() //a ser usado mais para a frente
   	{
@@ -79,9 +79,9 @@ public class Cyk
 			return false;
 	}
 
-  	private String table[][];
+  	private static String table[][];
   
-	public boolean checkCyk()
+	public static boolean checkCyk()
 	{
 	 	table = new String[rules.size()][rules.size()];
 		sentenceArray = new ArrayList(Arrays.asList(sentence.split(" ")));
@@ -99,12 +99,45 @@ public class Cyk
                 ArrayList<String> rule = new ArrayList<String>();
 				rule = rules.get(j);
 
-				if (rule.size() == 2) //so se for regra do tipo "A -> palavra" 
+				if (rule.size() == 2) //so se for regra do tipo "A -> terminal" 
 					if (sentenceArray.get(i).equals(rule.get(1))) //se a palavra da frase recebida for igual a da regra a ser processada
-                    	table[i][0] = table[i][0] + " " + rule.get(0); //adiciona o Simbolo a tabela               
+                    	table[i][0] = rule.get(0); //adiciona o Simbolo a tabela               
             }
         }
 
+
+		//Preencher o resto da tabela
+		//i - column, j - row
+        for (int i = 1; i < sentenceArray.size(); i++)
+			for (int j = 0; j < sentenceArray.size() - i; j++)
+				for (int k = 0; k < i; k++) //k=1					for (int r = 0; r < rules.size(); r++)
+					{						ArrayList<String> rule = new ArrayList<String>();
+						rule = rules.get(j);
+					
+						//if P[j,k,B] and P[j+k,i-k,C] then set P[j,i,A] = true
+					
+						if (rule.size() == 3) // apenas se for uma regra com simbolos nao terminais tipo "A -> B C"
+						{
+							/*if (!table[j][k].equals("") && !table[j+k+1][i-k-1].equals("")) 
+							{*/							  	//System.out.println(table[j+k+1][i-k-1]+" "+rule.get(2));
+							  	//System.out.println(table[j][k].indexOf(rule.get(1)));								
+								if (table[j][k].equals(rule.get(1)) && table[j+k+1][i-k-1].equals(rule.get(2)))
+								//if (table[j][k].indexOf(rule.get(1)) != -1 && table[j+k+1][i-k-1].indexOf(rule.get(2)) != -1)
+								{
+								 	System.out.println("cenas");									table[j][i] = table[i][0]+rule.get(0);
+								}
+							//}
+						}  
+					}
+
+		for (int i = 0; i < rules.size(); i++)
+		{
+			for (int j = 0; j < rules.size(); j++)
+			{				System.out.print(table[j][i]+" ");
+			}
+				System.out.println("");
+		}
+			
 		return true;	  
 	}
 	
@@ -121,7 +154,8 @@ public class Cyk
 			System.out.println("sim");
 		else
 			System.out.println("nao");
-			
+
+		checkCyk();
         // create the symbol table
         //cky.createSymbolTable(root);
 
@@ -144,14 +178,14 @@ SKIP :
 TOKEN:
 {
 	
-	 < SENTENCE: (< WORD > (" ")?)+ >
-	| < WORD: (["a"-"z"])+ > 
+	 < WORD: (["a"-"z"])+ >
+	| < SENTENCE: (< WORD > (" ")?)+ >  
 	| < SYMBOL: (["A"-"Z"])+ >
 }
 
 /*
 Assignment := (Symbol "->" Value ";")+
-Value := Symbol (Symbol)?;
+Value := Symbol Symbol;
 Value := Word;
 */
 
@@ -179,7 +213,7 @@ void Symbol() : {Token t;}
 		t=<WORD>  #Word {value.add(new String(t.image));}
 		| 		  
 		t=<SYMBOL> #Symbol {value.add(new String(t.image));}
-		( t=<SYMBOL> #Symbol {value.add(new String(t.image));} )? 		 		
+		t=<SYMBOL> #Symbol {value.add(new String(t.image));} 		 		
 	)
 	{		rules.add(value);
 		//System.out.print("adicionado");
