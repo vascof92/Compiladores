@@ -6,32 +6,31 @@ options
 
 PARSER_BEGIN(Cyk)
 
-import java.util.HashMap;
-import java.lang.Integer;
+import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 public class Cyk
 {
-  	/*Hashmap para armazenar as regras da gramatica. "A->B C" seria um par (A, (B,C))
-	static HashMap< String, ArrayList< String >> rules = new HashMap< String, ArrayList< String >>();*/
-
 	//Container para armazenar as regras da gramatica. Primeira string representa o simbolo. A -> B C seria um ArrayList("A","B","C")
     static ArrayList<ArrayList<String> > rules = new ArrayList<ArrayList<String> >();
   	static ArrayList< String > value = new ArrayList< String >();
+
+  	//frase a verificar
   	static String sentence = new String();
-  	static ArrayList< String > sentenceArray;
+  	static ArrayList< String > sentenceArray; //array com as palavras da frase
 
-  	/*static private void printRules() //a ser usado mais para a frente
-  	{
-        Object[] keys = rules.keySet().toArray();        
-        String[] stringArray = Arrays.copyOf(keys, keys.length, String[].class);
+	//tabela para preenchimento pelo algoritmo CYK
+  	private static String table[][];
 
-        for (int i = 0; i < stringArray.length; i++)
-        	System.out.println(stringArray[i]);
-  	}*/
-
+	//verifica se o simbolo recebido esta definido
 	static private boolean isSymbolDefined(String symbol)
 	{
 		boolean isDefined = false;
@@ -47,7 +46,8 @@ public class Cyk
 		
 		return isDefined;
 	}
-	
+
+	//verifica se todos os simbolos da gramatica estao definidos
 	static private boolean checkGrammar()
 	{
 		ArrayList<String> symbols = new ArrayList<String>();
@@ -78,9 +78,8 @@ public class Cyk
 		else 
 			return false;
 	}
-
-  	private static String table[][];
-  
+  	
+  	//verifica se a frase recebida pertence a gramatica atraves do algoritmo CYK
 	public static boolean checkCyk()
 	{	 	
 		sentenceArray = new ArrayList(Arrays.asList(sentence.split(" ")));
@@ -100,13 +99,12 @@ public class Cyk
 				rule = rules.get(j);
 
 				if (rule.size() == 2) //so se for regra do tipo "A -> terminal" 
-					if (sentenceArray.get(i).equals(rule.get(1))) //se a palavra da frase recebida for igual a da regra a ser processada
-                    	table[i][0] = rule.get(0); //adiciona o Simbolo a tabela               
+					if (sentenceArray.get(i).equals(rule.get(1))) //se a palavra da frase recebida existir
+                    	table[i][0] = rule.get(0); //adiciona o respectivo Simbolo a tabela               
             }
         }
 
 		//Preencher o resto da tabela
-		//i - row, j - column
         for (int i = 1; i < sentenceArray.size(); i++)
 			for (int j = 0; j < sentenceArray.size() - i; j++)
 				for (int k = 0; k < i; k++)					for (int r = 0; r < rules.size(); r++)
@@ -126,27 +124,64 @@ public class Cyk
 						}  
 					}
 
-		System.out.println("CYK Table:\n");
-		for (int i = 0; i < sentenceArray.size(); i++)
-		{
-			for (int j = 0; j < sentenceArray.size(); j++)
-			{				System.out.print(table[j][i]+" ");
-			}
-				System.out.println("");
-		}
+		printTable();
 
 		if (table[0][sentenceArray.size()-1].equals("")) //se a posicao mais alta da tabela estiver vazia
-			System.out.println("\nThis sentence isn't a member of the grammar.");
+			System.out.println("\nThe sentence \"" + sentence + "\" isn't a member of the given grammar.");
 		else
-			System.out.println("\nThis sentence is a member of the grammar.");
+			System.out.println("\nThe sentence \"" + sentence + "\" is a member of the given grammar.");
 			 
 		return true;	  
 	}
-	
-    public static void main(String args[]) throws ParseException {
-        System.out.println("\nInput context-free-grammar in CNF: ");
 
-        Cyk cyk = new Cyk(System.in);
+	//imprimir tabela
+	private static void printTable() {
+			
+		System.out.println("CYK Table:\u005cn");
+		for (int i = sentenceArray.size()-1; i >= 0; i--)
+		{
+	        for (int j = 0; j < sentenceArray.size(); j++)
+	        {
+	          	String tableValue = table[j][i];
+				//System.out.println(tableValue.length());
+	          	if (tableValue.length() == 1)
+	          		System.out.print(tableValue + "    ");
+	          	else if (tableValue.length() == 2)
+	          		System.out.print(tableValue + "   ");
+          		else if (tableValue.length() == 3)
+	          		System.out.print(tableValue + "  ");
+	          	else if (tableValue.length() > 3)
+	          	{					tableValue = tableValue.substring(0, 2);
+					System.out.print(tableValue + "  ");
+	          	}
+	          	else
+	          		System.out.print(tableValue + "_    ");
+	        }
+            System.out.println("\n");
+		}
+	}
+	
+   public static void main(String args[]) throws ParseException, IOException {
+
+		if (args.length != 1)		{			System.out.println("Usage: java -jar cyk.jar < file name >");
+			System.exit(1);
+		}
+		
+        String grammar = new String(), line = null;
+        BufferedReader reader = null;
+        try {
+        	reader = new BufferedReader(new FileReader(args[0]));
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found!");
+            System.exit(1);
+        }
+		
+        while ((line = reader.readLine()) != null) {
+        	grammar += line;
+        }
+
+        InputStream stream = new ByteArrayInputStream(grammar.getBytes(StandardCharsets.UTF_8));
+        Cyk cyk = new Cyk(stream);
         SimpleNode root = cyk.Program();
 		
         // dump tree
@@ -158,8 +193,9 @@ public class Cyk
 		 	System.out.println("---------------\nValid Grammar\n---------------");
 			checkCyk();
 		}
-		else		
+		else		
 			System.out.println("Invalid Grammar");
+			
         // create the symbol table
         //cky.createSymbolTable(root);
 
@@ -200,42 +236,44 @@ SimpleNode Program(): {}
 }
 
 void Assignment()#void:{}
-{	Symbol()#Symbol "->"Value()#Value";"
+{	Symbol() "->"Value()";"
 }
 
 void Symbol() #void : {Token t;}
 {
-  (    
+  (    
 	t=<SYMBOL> 
 	{
 		value = new ArrayList<String>();
-		//symbol = new String(t.image);
 		value.add(new String(t.image));
-		jjtThis.symbol= new String(t.image);
+		jjtThis.assignment= new String(t.image);
 	}
 ) #Symbol
 }
-void Value() #void : {Token t;} // "A - > B C;" ou "C - > valor;"
+void Value() #void : {Token t, t2;} 
 {	(
-		t=<WORD>   {
+		t=<WORD>
+		{
 		  value.add(new String(t.image));
-		  jjtThis.value= new String(t.image);}
+		  jjtThis.value= new String(t.image);
+		}#Value
 		| 		  
-		t=<SYMBOL>  {
-		  value.add(new String(t.image));
-		  jjtThis.value= new String(t.image);}
-		t=<SYMBOL>  {
-		  value.add(new String(t.image));
-		  jjtThis.value= new String(t.image);} 		 		
-	)#Value
+		t2=<SYMBOL>
+		{
+		  value.add(new String(t2.image));
+		  jjtThis.value= new String(t2.image);
+		}#Value1
+		t2=<SYMBOL> {
+		  value.add(new String(t2.image));
+		  jjtThis.value2= new String(t2.image);} #Value2		 		
+	)
 	{		rules.add(value);
-		//System.out.print("adicionado");
 	}
 }
 
 void Sentence() #void : {Token t;}
 {
-  (    
+  (    
 	t=< SENTENCE >
 	{
     	sentence = (new String(t.image));

@@ -3,91 +3,102 @@
 public
 class SimpleNode implements Node {
 
-  protected Node parent;
-  protected Node[] children;
-  protected int id;
-  protected Object value;
-  protected Cyk parser;
-  
-  
-  public String symbol;
-  public String sentence;
-  public String Value;
+	protected Node parent;
+	protected Node[] children;
+	protected int id;
+	protected Object value;
+	protected Object value1;
+	protected Object value2;
+	protected Cyk parser;
 
-  public SimpleNode(int i) {
-    id = i;
-  }
 
-  public SimpleNode(Cyk p, int i) {
-    this(i);
-    parser = p;
-  }
+	public String symbol;
+	public String assignment;
+	public String sentence;
 
-  public void jjtOpen() {
-  }
+	public SimpleNode(int i) {
+		id = i;
+	}
 
-  public void jjtClose() {
-  }
+	public SimpleNode(Cyk p, int i) {
+		this(i);
+		parser = p;
+	}
 
-  public void jjtSetParent(Node n) { parent = n; }
-  public Node jjtGetParent() { return parent; }
+	public void jjtOpen() {
+	}
 
-  public void jjtAddChild(Node n, int i) {
-    if (children == null) {
-      children = new Node[i + 1];
-    } else if (i >= children.length) {
-      Node c[] = new Node[i + 1];
-      System.arraycopy(children, 0, c, 0, children.length);
-      children = c;
-    }
-    children[i] = n;
-  }
+	public void jjtClose() {
+	}
 
-  public Node jjtGetChild(int i) {
-    return children[i];
-  }
+	public void jjtSetParent(Node n) { parent = n; }
+	public Node jjtGetParent() { return parent; }
 
-  public int jjtGetNumChildren() {
-    return (children == null) ? 0 : children.length;
-  }
+	public void jjtAddChild(Node n, int i) {
+		if (children == null) {
+			children = new Node[i + 1];
+		} else if (i >= children.length) {
+			Node c[] = new Node[i + 1];
+			System.arraycopy(children, 0, c, 0, children.length);
+			children = c;
+		}
+		children[i] = n;
+	}
 
-  public void jjtSetValue(Object value) { this.value = value; }
-  public Object jjtGetValue() { return value; }
+	public Node jjtGetChild(int i) {
+		return children[i];
+	}
 
-  /* You can override these two methods in subclasses of SimpleNode to
+	public int jjtGetNumChildren() {
+		return (children == null) ? 0 : children.length;
+	}
+
+	public void jjtSetValue(Object value) { this.value = value; }
+	public Object jjtGetValue() { return value; }
+
+	/* You can override these two methods in subclasses of SimpleNode to
      customize the way the node appears when the tree is dumped.  If
      your output uses more than one line you should override
      toString(String), otherwise overriding toString() is probably all
      you need to do. */
 
-  public String toString() { return CykTreeConstants.jjtNodeName[id]; }
-  public String toString(String prefix) { return prefix + toString(); }
+	public String toString() { return CykTreeConstants.jjtNodeName[id]; }
+	public String toString(String prefix) { return prefix + toString(); }
 
-  /* Override this method if you want to customize how the node dumps
+	/* Override this method if you want to customize how the node dumps
      out its children. */
 
-  public void dump(String prefix) {
-    System.out.println(toString(prefix));
-    
-    if(symbol!=null){
-    	System.out.println("\t"+symbol);
-    }
-    if(sentence!=null){
-    	System.out.println("\t"+sentence);
-    }
-    if(value!=null){
-    	System.out.println("\t"+value);
-    }
-    
-    if (children != null) {
-      for (int i = 0; i < children.length; ++i) {
-        SimpleNode n = (SimpleNode)children[i];
-        if (n != null) {
-          n.dump(prefix + " ");
-        }
-      }
-    }
-  }
+	public void dump(String prefix) {
+		
+
+		if(symbol!=null){
+			System.out.println("\t"+symbol);
+		}
+		if(assignment!=null){
+			System.out.println(assignment);
+		}
+		if(sentence!=null){
+			System.out.println(sentence);
+		}
+		if(value!=null){
+			System.out.println("\t"+value);
+		}
+		if(value1!=null){
+			System.out.println("\t"+value1);
+		}
+		if(value2!=null){
+			System.out.println("\t"+value2);
+		}
+
+		if (children != null) {
+			for (int i = 0; i < children.length; ++i) {
+				SimpleNode n = (SimpleNode)children[i];
+				if (n != null) {
+					n.dump(prefix + " ");
+				}
+			}
+		}
+	}
 }
 
 /* JavaCC - OriginalChecksum=bd4fe64653cfdc5f791d197e15fd8acf (do not edit this line) */
