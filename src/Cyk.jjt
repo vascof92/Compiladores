@@ -143,7 +143,7 @@ public class Cyk
 	        for (int j = 0; j < sentenceArray.size(); j++)
 	        {
 	          	String tableValue = table[j][i];
-				//System.out.println(tableValue.length());
+	          	
 	          	if (tableValue.length() == 1)
 	          		System.out.print(tableValue + "    ");
 	          	else if (tableValue.length() == 2)
@@ -194,16 +194,7 @@ public class Cyk
 			checkCyk();
 		}
 		else		
-			System.out.println("Invalid Grammar");
-			
-        // create the symbol table
-        //cky.createSymbolTable(root);
-
-        // execute the interpreter
-        /*int value = myCalc.eval(root);
-
-        System.out.println("Resultant value: "+value);
-        */
+			System.out.println("Invalid Grammar!");
     }
 }
 
