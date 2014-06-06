@@ -1,0 +1,1 @@
+Neste exemplo a gramática é inválida (o N não está definido), pelo que o output será a indicação disso.

@@ -1,0 +1,1 @@
+Neste exemplo a frase pertence à gramática.

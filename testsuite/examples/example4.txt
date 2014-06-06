@@ -1,0 +1,12 @@
+NP -> DET NOM;
+NOM -> book;
+NOM -> orange;
+NOM -> AP NOM;
+AP -> heavy;
+AP -> orange;
+AP -> ADV A;
+A -> heavy;
+A -> orange;
+DET -> a;
+ADV -> very;
+a very orange book;;
