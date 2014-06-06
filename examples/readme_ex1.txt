@@ -1,0 +1,1 @@
+Neste exemplo a frase pertence a gramatica pelo que no output devera aparecer a arvore sintatica,a  indicação de que a gramatica é valida e a tabela do algoritmo cyk.

@@ -1,0 +1,1 @@
+Neste exemplo a frase nao pertence a gramatica pelo que o output do programa devera ser "The sentence isn't a member of the given grammar"
